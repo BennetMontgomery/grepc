@@ -29,6 +29,7 @@ int main(int argc, char **argv) {
 	
 	//flag trackers (0 = inactive, 1 = active)
 	int ignoreCase = 0;
+	int invertMatch = 0;
 
 	regex_t pattern;
 
@@ -47,6 +48,8 @@ int main(int argc, char **argv) {
 					break;
 				} else if(!strcmp(argv[i], "--ignore-case")) {
 					ignoreCase = 1;
+				} else if(!strcmp(argv[i], "--invert-match")) {
+					invertMatch = 1;
 				} else {
 					fprintf(stderr, "Error: invalid string flag %s\n", argv[i]);
 				}
@@ -54,7 +57,9 @@ int main(int argc, char **argv) {
 				for(int j = 1; argv[i][j] != '\0'; ++j) {
 					if(argv[i][j] == 'i' || argv[i][j] == 'y') {
 						ignoreCase = 1;
-					} else {
+					} else if(argv[i][j] == 'v') {
+				 		invertMatch = 1;
+					}else {
 						fprintf(stderr, "Error: invalid char flag %c\n", argv[i][j]);
 					}
 				}
@@ -84,7 +89,9 @@ int main(int argc, char **argv) {
 			if (ignoreCase) {
 				processedLine = strlwr(line);
 			}
-			if (!regexec(&pattern, processedLine, 0, NULL, 0)) {
+			if (!regexec(&pattern, processedLine, 0, NULL, 0) && !invertMatch) {
+				printf("%d: %s", linecounter, line);
+			} else if(invertMatch) {
 				printf("%d: %s", linecounter, line);
 			}
 			linecounter++;
